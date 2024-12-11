@@ -10,11 +10,10 @@ import matplotlib.pyplot as plt
 
 
 shapefile_path = "path_to_shapefile/tl_2021_36_tract.shp"
-gdf = gpd.read_file(shapefile_path)
-
+gdf = gpd.read_file("code/data/census_tracts/tl_2024_36_tract.shp")
 # Replace 'your_api_key' with your actual Census API key
 API_KEY = "4ca091407dc4c018ee7aa725fe60c9362b0f86ba"
-c = Census(API_KEY, )
+c = Census(API_KEY)
 
 
 data = c.acs5.state_county_tract(
@@ -22,14 +21,15 @@ data = c.acs5.state_county_tract(
     state_fips="36",          # New York State
     county_fips="067",        # Onondaga County
     tract="*",
-    with_geo = True
 )
-print(data)
+
 df = pd.DataFrame(data)
+df['tract_number'] = df['NAME'].str.extract(r'(\d+\.\d+|\d+)').astype(float)
+syracuse_df = df[df['tract_number'] <= 61.03]
+print("Syracuse CENSUS")
+print(syracuse_df.head(3))
 
-# Extract tract number from the 'NAME' field
-df["Tract_Number"] = df["NAME"].str.extract(r"Census Tract (\d+\.?\d*)").astype(float)
+merge_df = syracuse_df.merge(gdf, left_on="tract", right_on="TRACTCE")
+print("Merged")
+print(merge_df.head(3))
 
-# Filter for tracts with numbers <= 61.03
-syracuse_data = df[df["Tract_Number"] <= 61.03]
-st.dataframe(syracuse_data)
