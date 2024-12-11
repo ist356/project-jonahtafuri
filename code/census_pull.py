@@ -33,3 +33,18 @@ merge_df = syracuse_df.merge(gdf, left_on="tract", right_on="TRACTCE")
 print("Merged")
 print(merge_df.head(3))
 
+merge_gdf = gpd.GeoDataFrame(merge_df, geometry='geometry')
+
+
+# Streamlit setup
+st.title('Syracuse Census Tracts - Median Household Income')
+
+# Create the plot
+fig, ax = plt.subplots(figsize=(10, 10))
+merge_gdf.plot(column='B19013_001E', cmap='viridis', legend=True, ax=ax)
+plt.title('Median Household Income in Syracuse Tracts')
+plt.xlabel('Longitude')
+plt.ylabel('Latitude')
+
+# Show the plot in Streamlit
+st.pyplot(fig)
