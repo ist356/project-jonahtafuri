@@ -44,3 +44,18 @@ def tullyscraper(playwright: Playwright) -> None:
     context.close()
     browser.close()
     return df
+
+def scraper(playwright: Playwright, category, price, time) -> None:
+    browser = playwright.chromium.launch(headless=False)
+    context = browser.new_context()
+    page = context.new_page()
+    page.goto(f"https://www.eventbrite.com/d/ny--syracuse/{price}--{category}--events--{time}/?page=1")
+    sleep(2)
+
+    context.close()
+    browser.close()
+    # return df
+
+if __name__ == "__main__":
+    with sync_playwright() as p:
+        scraper("free", "this-weekend")
