@@ -1,6 +1,6 @@
 from playwright.sync_api import Playwright, sync_playwright
 from time import sleep
-from census import Census
+from census import Census as c
 import requests
 import streamlit as st
 import pandas as pd
@@ -11,7 +11,14 @@ import matplotlib.pyplot as plt
 
 shapefile_path = "path_to_shapefile/tl_2021_36_tract.shp"
 gdf = gpd.read_file("code/data/census_tracts/tl_2024_36_tract.shp")
+
 api_key = input("Enter your Census API key: ")
+
+api_key = st.write("Enter your Census API key: ")
+
+if not api_key:
+    raise ValueError("You must enter a valid Census API key")
+
 
 data = c.acs5.state_county_tract(
     ("NAME", "B19013_001E"),  # Median Household Income
