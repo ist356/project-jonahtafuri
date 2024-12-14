@@ -11,10 +11,7 @@ import matplotlib.pyplot as plt
 
 shapefile_path = "path_to_shapefile/tl_2021_36_tract.shp"
 gdf = gpd.read_file("code/data/census_tracts/tl_2024_36_tract.shp")
-# Replace 'your_api_key' with your actual Census API key
-API_KEY = "4ca091407dc4c018ee7aa725fe60c9362b0f86ba"
-c = Census(API_KEY)
-
+api_key = input("Enter your Census API key: ")
 
 data = c.acs5.state_county_tract(
     ("NAME", "B19013_001E"),  # Median Household Income
