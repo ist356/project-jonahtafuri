@@ -1,13 +1,15 @@
 from census_call import get_census_data
 from census_call import get_census_tables
 from census_call import merge_with_shapefile
-
+import os
+import tempfile
+import zipfile
 import streamlit as st
 import folium
 from streamlit_folium import st_folium
 import streamlit_folium as sf
 
-
+st.title("Syracuse Census Data Mapper")
 api_key = st.text_input("Enter your Census API key: ")
 
 
@@ -15,16 +17,16 @@ api_key = st.text_input("Enter your Census API key: ")
 if api_key:
     col1, col2 = st.columns(2)
     with col1:
-        year = st.selectbox("Select year", [2017, 2018, 2019, 2020, 2021, 2022])
+        year = st.selectbox("Select Census Year", [2017, 2018, 2019, 2020, 2021, 2022])
     with col2:
-        metric = st.text_input("Enter metric ID", "B19013_001E")
+        metric = st.text_input("Enter Metric ID", "B19013_001E")
 
     # Initialize session state for the button
     if 'get_vars' not in st.session_state:
         st.session_state.get_vars = False
 
     # Button to view census tables
-    if st.button("View Census Tables for selected year"):
+    if st.button("View Census Tables for Selected year"):
         st.session_state.get_vars = True
 
     if st.session_state.get_vars:
@@ -36,7 +38,7 @@ if api_key:
         st.session_state.load_map = False
 
     # Button to load the map
-    if st.button("Load map"):
+    if st.toggle("Load map"):
         st.session_state.load_map = True
 
     if st.session_state.load_map:
@@ -45,7 +47,7 @@ if api_key:
         st.dataframe(gdf)
 
         # Create a base Folium map
-        m = folium.Map(location=[43.088947, -76.154480], zoom_start=12)  # Coordinates for Syracuse, NY
+        m = folium.Map(location=[43.04041857049036, -76.14400626122578], zoom_start=12)  # Coordinates for Syracuse, NY
 
         # Define a style function for the polygons
         def style_function(feature):
@@ -84,5 +86,28 @@ if api_key:
             ).add_to(m)
 
         # Display the Folium map in Streamlit
-        st.title("Polygon Layer Map")
+        st.title(f"Map of {metric}")
         st_folium(m, width=700, height=500)
+
+
+        with tempfile.TemporaryDirectory() as tmpdirname:
+            shapefile_path = os.path.join(tmpdirname, "syracuse_census_data.shp")
+            gdf.to_file(shapefile_path)
+            
+            zip_path = os.path.join(tmpdirname, "syracuse_census_data.zip")
+            with zipfile.ZipFile(zip_path, 'w') as zipf:
+                for ext in ['shp', 'shx', 'dbf', 'prj', 'cpg']:
+                    file_path = shapefile_path.replace('.shp', f'.{ext}')
+                    zipf.write(file_path, os.path.basename(file_path))
+            
+            with open(zip_path, "rb") as f:
+                st.download_button(
+                    label="Download Shapefile",
+                    data=f,
+                    file_name="syracuse_census_data.zip",
+                    mime="application/zip"
+                )
+
+            
+
+        
