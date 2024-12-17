@@ -1,0 +1,9 @@
+pandas
+census
+geopandas
+os
+tempfile
+zipfile
+streamlit
+folium
+streamlit_folium

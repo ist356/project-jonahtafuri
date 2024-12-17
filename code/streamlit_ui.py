@@ -43,6 +43,7 @@ if api_key:
 
     if st.session_state.load_map:
         df = get_census_data(api_key, metric, year)
+        df = df[df[metric] != -666666666]
         gdf = merge_with_shapefile(df)
         st.dataframe(gdf)
 
@@ -64,7 +65,7 @@ if api_key:
             data=gdf,
             columns=['GEOID', metric],
             key_on='feature.properties.GEOID',
-            fill_color='YlOrRd',
+            fill_color='PuBuGn',
             fill_opacity=0.7,
             line_opacity=0.2,
             legend_name='Median Household Income'
@@ -104,7 +105,7 @@ if api_key:
                 st.download_button(
                     label="Download Shapefile",
                     data=f,
-                    file_name="syracuse_census_data.zip",
+                    file_name=f"syracuse-{metric}-{year}.zip",
                     mime="application/zip"
                 )
 
