@@ -7,3 +7,4 @@ zipfile
 streamlit
 folium
 streamlit_folium
+requests
