@@ -40,6 +40,5 @@ if __name__ == "__main__":
     api_key = input("Enter your Census API key: ")
     df = get_census_data(api_key, "B19013_001E")
     gdf = gpd.read_file("code/data/census_tracts/tl_2024_36_tract.shp")    
-    #write to cache
     merge_df = merge_with_shapefile(df)
 
