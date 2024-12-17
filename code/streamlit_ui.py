@@ -98,7 +98,7 @@ if api_key:
     )
     col1, col2 = st.columns([3, 1])
     with col1:
-        metric = st.text_input("Enter the metric variable ID to map", "B19013_001E")
+        metric = st.text_input("Enter the metric variable ID to map (see census tables for more info)", "B19013_001E")
     with col2:
             # Button to load the map
         st.write("")
