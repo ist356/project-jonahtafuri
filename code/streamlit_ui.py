@@ -27,7 +27,7 @@ if api_key:
     # Button to view census tables
         st.write("")
         st.write("")
-        if st.button("View Census Tables for Selected year"):
+        if st.button("View Census Tables for Selected Year"):
             st.session_state.get_tables = True
 
     if st.session_state.get_tables:
