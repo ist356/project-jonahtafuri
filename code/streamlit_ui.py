@@ -12,6 +12,43 @@ from census import Census
 import requests
 import time
 
+
+
+@st.cache_data
+def generate_map(gdf, metric):
+    # Create a Folium map
+    m = folium.Map(location=[43.04041857049036, -76.14400626122578], zoom_start=12)
+
+    # Create a choropleth map
+    folium.Choropleth(
+        geo_data=gdf,
+        name='choropleth',
+        data=gdf,
+        columns=['GEOID', metric],
+        key_on='feature.properties.GEOID',
+        fill_color='PuBuGn',
+        fill_opacity=0.7,
+        line_opacity=0.2,
+        legend_name=metric
+    ).add_to(m)
+
+    # Add GeoJSON for tooltips
+    folium.GeoJson(
+        data=gdf,
+        tooltip=folium.GeoJsonTooltip(fields=['tract_number', metric], aliases=['Tract:', f'{metric}:'])
+    ).add_to(m)
+
+    # Add markers for tract labels
+    for _, row in gdf.iterrows():
+        centroid = row['geometry'].centroid
+        folium.Marker(
+            location=[centroid.y, centroid.x],
+            icon=folium.DivIcon(html=f"""<div style="font-size: 12px; color: black;">{row['tract_number']}</div>""")
+        ).add_to(m)
+
+    return m
+
+
 st.title("Syracuse Census Data Mapper")
 api_key = st.text_input("Enter your Census API key: ")
 
@@ -90,9 +127,9 @@ if api_key:
                 else:
                     st.write("No variables found for the selected Table ID.")
             else:
-                st.error("Failed to fetch variables.")
+                st.error("Failed to fetch variables.")        
+                
     
-    # Initialize session state for the button
     if 'load_map' not in st.session_state:
         st.session_state.load_map = False
 
@@ -109,8 +146,7 @@ if api_key:
             # Button to load the map
         st.write("")
         st.write("")
-        if st.toggle("Load map"):
-            st.session_state.load_map = True
+        st.session_state.load_map = st.checkbox("Load Map", value=st.session_state.load_map)
 
     
 
