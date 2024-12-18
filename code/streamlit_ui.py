@@ -10,6 +10,7 @@ from streamlit_folium import st_folium
 import streamlit_folium as sf
 from census import Census
 import requests
+import time
 
 st.title("Syracuse Census Data Mapper")
 api_key = st.text_input("Enter your Census API key: ")
@@ -31,6 +32,8 @@ if api_key:
             st.session_state.get_tables = True
 
     if st.session_state.get_tables:
+        with st.spinner("Fetching tables..."):
+            time.sleep(2)
         tables = get_census_tables(api_key, year)
         st.dataframe(tables)
         # Initialize session state for the button
@@ -53,6 +56,9 @@ if api_key:
 
         if st.session_state.get_vars:
             # Fetch variables from the Census metadata endpoint
+            with st.spinner(f"Fetching variables for {entry}..."):
+                time.sleep(2)
+
             url = f"https://api.census.gov/data/{year}/acs/acs5/variables.json"
             response = requests.get(url)
 
@@ -109,6 +115,8 @@ if api_key:
     
 
     if st.session_state.load_map:
+        with st.spinner(f"Loading map of {metric}..."):
+            time.sleep(3)
         df = get_census_data(api_key, metric, year)
         df = df[df[metric] != -666666666]
         gdf = merge_with_shapefile(df)
